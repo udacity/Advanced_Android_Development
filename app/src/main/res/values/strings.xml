@@ -117,5 +117,6 @@
     <string name="empty_forecast_list_no_network">No weather information available. The network is not available to fetch weather data.</string>
     <string name="empty_forecast_list_server_down">No weather information available. The server is not returning data.</string>
     <string name="empty_forecast_list_server_error">No weather information available. The server is not returning valid data. Please check for an updated version of Sunshine.</string>
+    <string name="empty_forecast_list_invalid_location">No weather information available. The location in settings is not recognized by the weather server.</string>
 
 </resources>
