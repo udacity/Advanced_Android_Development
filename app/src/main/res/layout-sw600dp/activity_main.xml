@@ -13,13 +13,14 @@
      See the License for the specific language governing permissions and
      limitations under the License.
  -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,33 +33,34 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-        <!-- These FrameLayouts are only there to line the image up with the keyline correctly, since
-             we cannot do addition of dimensions/attributes otherwise -->
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <!-- This Space is only there to line the image up with the
+             keyline correctly, since we cannot do addition of
+             dimensions/attributes otherwise -->
+        <android.support.v4.widget.Space
+            android:id="@+id/sunshineLogoAlign"
+            android:layout_width="@dimen/list_icon"
+            android:layout_height="0dp"
             android:layout_marginLeft="@dimen/abc_list_item_padding_horizontal_material"
             android:layout_marginStart="@dimen/abc_list_item_padding_horizontal_material"
-            >
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/list_icon"
-                android:layout_marginStart="@dimen/list_icon"
-                android:paddingLeft="@dimen/abc_list_item_padding_horizontal_material"
-                android:paddingStart="@dimen/abc_list_item_padding_horizontal_material">
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/toolbar"/>
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="?attr/listPreferredItemHeight"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_logo"
-                    android:contentDescription="@string/app_name"/>
-            </FrameLayout>
-        </FrameLayout>
-    </LinearLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/listPreferredItemHeight"
+            android:layout_gravity="center_vertical"
+            android:layout_below="@id/sunshineLogoAlign"
+            android:layout_marginLeft="@dimen/abc_list_item_padding_horizontal_material"
+            android:layout_marginStart="@dimen/abc_list_item_padding_horizontal_material"
+            android:layout_toRightOf="@id/sunshineLogoAlign"
+            android:src="@drawable/ic_logo"
+            android:contentDescription="@string/app_name"/>
+    </RelativeLayout>
 
     <!-- This is used as a strut to create two columns in our RelativeLayout -->
     <android.support.v4.widget.Space
@@ -79,11 +81,11 @@
         android:layout_below="@id/appbar"
         tools:layout="@android:layout/list_content" />
 
-    <!-- We set elevation here only so the detail view doesn't get occluded
-         by the AppBar -->
-
-    <FrameLayout
-        android:id="@+id/weather_detail_container"
+    <!-- This is used to give the card the appropriate margin
+         list_item_extra_padding +
+         abc_list_item_padding_horizontal_material -->
+    <android.support.v7.widget.Space
+        android:id="@+id/cardviewAligner"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignLeft="@id/layout_center"
@@ -94,9 +96,20 @@
         android:elevation="@dimen/appbar_elevation"
         android:layout_marginRight="@dimen/list_item_extra_padding"
         android:layout_marginEnd="@dimen/list_item_extra_padding"
-        android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
-        android:paddingEnd="@dimen/abc_list_item_padding_horizontal_material"
-        android:paddingBottom="@dimen/detail_container_bottom_margin"
         />
+        <android.support.v7.widget.CardView
+            android:id="@+id/weather_detail_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignLeft="@id/cardviewAligner"
+            android:layout_alignRight="@id/cardviewAligner"
+            android:layout_alignTop="@id/cardviewAligner"
+            android:layout_alignBottom="@id/cardviewAligner"
+            android:layout_marginRight="@dimen/abc_list_item_padding_horizontal_material"
+            android:layout_marginEnd="@dimen/abc_list_item_padding_horizontal_material"
+            android:layout_marginBottom="@dimen/detail_container_bottom_margin"
+            app:cardElevation="@dimen/detail_card_elevation"
+            app:cardPreventCornerOverlap="false"
+            />
 
 </RelativeLayout>

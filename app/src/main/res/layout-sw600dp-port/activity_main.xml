@@ -52,14 +52,15 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/details_app_bar_overlap" />
 
-    <FrameLayout
+    <android.support.v7.widget.CardView
         android:id="@+id/weather_detail_container"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:elevation="@dimen/appbar_elevation"
         android:layout_below="@id/sunshine_logo_imageview"
-        android:paddingLeft="@dimen/abc_list_item_padding_horizontal_material"
-        android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
+        android:layout_marginLeft="@dimen/abc_list_item_padding_horizontal_material"
+        android:layout_marginRight="@dimen/abc_list_item_padding_horizontal_material"
+        app:cardElevation="@dimen/detail_card_elevation"
+        app:cardPreventCornerOverlap="false"
         />
 
     <fragment
