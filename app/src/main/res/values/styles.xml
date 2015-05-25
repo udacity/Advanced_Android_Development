@@ -16,25 +16,22 @@
 <resources>
 
    <!-- Base application theme. -->
-    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
             <item name="colorPrimary">@color/primary</item>
             <item name="colorPrimaryDark">@color/primary_dark</item>
             <item name="colorAccent">@color/accent</item>
+            <item name="toolbarStyle">@style/Toolbar</item>
     </style>
 
-    <!-- Main activity theme. -->
-    <style name="ForecastTheme" parent="AppTheme">
-        <item name="actionBarStyle">@style/ActionBar.Solid.Sunshine.NoTitle</item>
-    </style>
 
     <!-- Settings activity theme. -->
     <style name="SettingsTheme" parent="AppTheme">
     </style>
 
-    <!-- main activity action bar styles -->
-    <style name="ActionBar.Solid.Sunshine.NoTitle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="displayOptions">useLogo|showHome</item>
-        <item name="logo">@drawable/ic_logo</item>
+    <!-- main activity toolbar style -->
+    <style name="Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="popupTheme">@style/Theme.AppCompat.Light</item>
     </style>
 
     <!-- Style for forecast listview -->
