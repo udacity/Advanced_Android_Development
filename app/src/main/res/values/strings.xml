@@ -136,6 +136,9 @@
     <!-- Strings related to Notification preference -->
     <string name="pref_last_notification">last_notification</string>
 
+    <!-- Strings related to Widgets -->
+    <string name="title_widget_today">Sunshine Today</string>
+
     <!-- Empty Weather Database -->
     <string name="empty_forecast_list">No Weather Information Available</string>
     <string name="empty_forecast_list_no_network">No weather information available. The network is not available to fetch weather data.</string>

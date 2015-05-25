@@ -52,4 +52,8 @@
 
     <dimen name="detail_card_elevation">6dp</dimen>
     <dimen name="landscape_forecast_view_width">360dp</dimen>
+
+    <!-- Today Widget -->
+    <dimen name="widget_today_default_width">40dp</dimen>
+    <dimen name="widget_today_default_height">40dp</dimen>
 </resources>
