@@ -20,6 +20,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/touch_selector"
+    android:paddingLeft="@dimen/list_item_extra_padding"
+    android:paddingRight="@dimen/list_item_extra_padding"
     >
 
     <LinearLayout

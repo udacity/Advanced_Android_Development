@@ -14,10 +14,9 @@
      limitations under the License.
  -->
 <resources>
-    <!--
-    For more on layout aliases, see:
-    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
-    -->
-    <!-- Replace fragment detail view with layout that takes advantage of more available width.-->
-    <item type="layout" name="fragment_detail_start">@layout/fragment_detail_wide</item>
+    <!-- Extra List Item Margin (tablet-only) -->
+    <dimen name="list_item_extra_padding">80dp</dimen>
+    <dimen name="detail_view_padding_vertical">@dimen/abc_list_item_padding_horizontal_material</dimen>
+    <dimen name="forecast_temperature_space">@dimen/abc_list_item_padding_horizontal_material</dimen>
+
 </resources>

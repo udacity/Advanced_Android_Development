@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
      Copyright (C) 2015 The Android Open Source Project
 
@@ -14,10 +15,5 @@
      limitations under the License.
  -->
 <resources>
-    <!--
-    For more on layout aliases, see:
-    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
-    -->
-    <!-- Replace fragment detail view with layout that takes advantage of more available width.-->
-    <item type="layout" name="fragment_detail_start">@layout/fragment_detail_wide</item>
+    <item type="layout" name="fragment_detail_start">@layout/fragment_detail</item>
 </resources>
