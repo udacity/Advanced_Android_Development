@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
      Copyright (C) 2015 The Android Open Source Project
 
@@ -14,73 +15,74 @@
      limitations under the License.
  -->
 <!-- Layout for weather forecast list item for today -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    android:orientation="horizontal"
-    android:background="@drawable/today_touch_selector">
-
-    <LinearLayout
+    android:background="@drawable/touch_selector_white"
+    android:elevation="4dp"
+    >
+    <android.support.v7.widget.GridLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="7"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="60dp"
-        android:layout_marginStart="60dp"
-        android:orientation="vertical">
+        app:columnCount="2">
 
         <TextView
             android:id="@+id/list_item_date_textview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:textAppearanceLarge"
-            android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/white" />
-
-        <TextView
-            android:id="@+id/list_item_high_textview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="72sp"
-            android:fontFamily="sans-serif-light"
-            android:textColor="@color/white" />
-
-        <TextView
-            android:id="@+id/list_item_low_textview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="36sp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="5"
-        android:layout_marginRight="16dp"
-        android:layout_marginEnd="16dp"
-        android:orientation="vertical"
-        android:gravity="center_horizontal|bottom">
+            android:layout_marginBottom="@dimen/abc_list_item_padding_horizontal_material"
+            android:layout_marginTop="@dimen/abc_list_item_padding_horizontal_material"
+            android:fontFamily="sans-serif"
+            android:gravity="center_horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="@color/secondary_text"
+            app:layout_columnSpan="2"
+            app:layout_columnWeight="1"
+            app:layout_gravity="fill_horizontal"
+            tools:text="Today, April 03" />
 
         <ImageView
             android:id="@+id/list_item_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:adjustViewBounds="true"/>
+            android:layout_width="0dp"
+            android:adjustViewBounds="true"
+            android:maxHeight="@dimen/today_icon"
+            android:maxWidth="@dimen/today_icon"
+            app:layout_columnWeight="1"
+            app:layout_gravity="fill_horizontal"
+            tools:src="@drawable/art_clouds" />
+
+        <TextView
+            android:id="@+id/list_item_high_textview"
+            android:layout_width="0dp"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center_horizontal"
+            android:textColor="@color/primary_text"
+            android:textSize="72sp"
+            app:layout_columnWeight="1"
+            app:layout_gravity="fill_horizontal"
+            tools:text="19" />
 
         <TextView
             android:id="@+id/list_item_forecast_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-condensed"
-            android:layout_gravity="center_horizontal"
-            android:textAppearance="?android:textAppearanceLarge"
-            android:textColor="@color/white"/>
-    </LinearLayout>
-</LinearLayout>
+            android:layout_width="0dp"
+            android:fontFamily="sans-serif"
+            android:gravity="center_horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="@color/secondary_text"
+            app:layout_columnWeight="1"
+            tools:text="Rainy" />
+
+        <TextView
+            android:id="@+id/list_item_low_textview"
+            android:layout_width="0dp"
+            android:layout_marginBottom="@dimen/abc_list_item_padding_horizontal_material"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center_horizontal"
+            android:textColor="@color/secondary_text"
+            android:textSize="36sp"
+            app:layout_columnWeight="1"
+            tools:text="10" />
+
+    </android.support.v7.widget.GridLayout>
+</FrameLayout>
