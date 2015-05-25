@@ -49,4 +49,6 @@
     <dimen name="detail_view_padding">@dimen/abc_list_item_padding_horizontal_material</dimen>
     <dimen name="forecast_detail_padding_wide">16dp</dimen>
     <dimen name="detail_container_bottom_margin">@dimen/detail_view_padding</dimen>
+
+    <dimen name="detail_card_elevation">6dp</dimen>
 </resources>
