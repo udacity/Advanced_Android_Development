@@ -35,7 +35,6 @@
             android:layout_height="?attr/actionBarSize"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
-
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
         <!-- This Space is only there to line the image up with the

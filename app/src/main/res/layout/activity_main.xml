@@ -14,12 +14,9 @@
      limitations under the License.
  -->
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_forecast"
     android:name="com.example.android.sunshine.app.ForecastFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:layout="@android:layout/list_content"
-    app:sharedElementTransitions="true"
-    />
+    android:layout_height="wrap_content"
+    app:sharedElementTransitions="true"/>
