@@ -105,6 +105,24 @@ public class Utility {
     }
 
     /**
+     * Helper method to convert the database representation of the date into something to display
+     * to users.  As classy and polished a user experience as "20140102" is, we can do better.
+     *
+     * @param context Context to use for resource localization
+     * @param dateInMillis The date in milliseconds
+     * @return a user-friendly representation of the date.
+     */
+    public static String getFullFriendlyDayString(Context context, long dateInMillis) {
+
+        String day = getDayName(context, dateInMillis);
+        int formatId = R.string.format_full_friendly_date;
+        return String.format(context.getString(
+                formatId,
+                day,
+                getFormattedMonthDay(context, dateInMillis)));
+    }
+
+    /**
      * Given a day, returns just the name to use for that day.
      * E.g "today", "tomorrow", "wednesday".
      *
@@ -215,6 +233,19 @@ public class Utility {
             return R.drawable.ic_cloudy;
         }
         return -1;
+    }
+
+    /**
+     * Helper method to return whether or not Sunshine is using local graphics.
+     *
+     * @param context Context to use for retrieving the preference
+     * @return true if Sunshine is using local graphics, false otherwise.
+     */
+    public static boolean usingLocalGraphics(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String sunshineArtPack = context.getString(R.string.pref_art_pack_sunshine);
+        return prefs.getString(context.getString(R.string.pref_art_pack_key),
+                sunshineArtPack).equals(sunshineArtPack);
     }
 
     /**
