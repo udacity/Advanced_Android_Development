@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:elevation="0dp">
+        app:elevation="@dimen/appbar_elevation">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -46,10 +46,8 @@
                 android:layout_gravity="center_horizontal"
                 android:contentDescription="@string/app_name"
                 android:scaleType="center"
-                android:src="@drawable/ic_logo"
-                app:layout_scrollFlags="scroll|enterAlways" />
+                android:src="@drawable/ic_logo"/>
             </android.support.v7.widget.Toolbar>
-
 
     </android.support.design.widget.AppBarLayout>
 
