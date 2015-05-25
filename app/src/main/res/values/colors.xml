@@ -33,4 +33,10 @@
     <color name="detail_accent_pane_background">#455A64</color>
     <color name="detail_accent_label">#90A4AE</color>
 
+    <!-- the activated state color -->
+    <color name="activated">#E0E0E0</color>
+
+    <!-- the color used for the low temperature in the forecast list -->
+    <color name="forecast_low_text">#607D8B</color>
+
 </resources>

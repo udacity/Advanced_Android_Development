@@ -23,7 +23,19 @@
 
     <!-- Icon Sizes -->
     <dimen name="today_icon">96dp</dimen>
+    <dimen name="list_icon">40dp</dimen>
+
+    <!-- Text Sizes - We are using DP here rather than SP because these are already large
+         font sizes, and going larger will cause lots of view problems.  This is only for
+         the large forecast numbers in the forecast list -->
+    <dimen name="forecast_text_size">32dp</dimen>
+
+    <!-- This is an odd width, but we're trying to match the font closely to keep things working
+         on devices that don't yet have Roboto -->
+    <dimen name="forecast_text_width">49dp</dimen>
+    <dimen name="forecast_temperature_space">8dp</dimen>
 
     <!-- Extra Padding -->
     <dimen name="detail_view_extra_padding">@dimen/abc_list_item_padding_horizontal_material</dimen>
+
 </resources>
