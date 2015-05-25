@@ -92,9 +92,11 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:layout_alignStart="@id/layout_center"
         android:elevation="@dimen/appbar_elevation"
+        android:layout_marginRight="@dimen/list_item_extra_padding"
+        android:layout_marginEnd="@dimen/list_item_extra_padding"
         android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
         android:paddingEnd="@dimen/abc_list_item_padding_horizontal_material"
-        android:paddingBottom="@dimen/abc_list_item_padding_horizontal_material"
+        android:paddingBottom="@dimen/detail_container_bottom_margin"
         />
 
 </RelativeLayout>
