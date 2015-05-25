@@ -16,6 +16,7 @@
 package com.example.android.sunshine.app;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +38,7 @@ public class DetailActivity extends AppCompatActivity {
 
             Bundle arguments = new Bundle();
             arguments.putParcelable(DetailFragment.DETAIL_URI, getIntent().getData());
+            arguments.putBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, true);
 
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(arguments);
@@ -44,6 +46,9 @@ public class DetailActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.weather_detail_container, fragment)
                     .commit();
+
+            // Being here means we are in animation mode
+            supportPostponeEnterTransition();
         }
     }
 }

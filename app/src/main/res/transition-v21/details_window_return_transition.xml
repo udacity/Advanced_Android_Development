@@ -16,7 +16,7 @@
  -->
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
     android:transitionOrdering="together"
-    android:duration="500">
+    android:duration="250">
     <fade>
         <targets>
             <target android:excludeId="@android:id/statusBarBackground" />

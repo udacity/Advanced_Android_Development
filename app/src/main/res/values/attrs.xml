@@ -21,5 +21,6 @@
     <declare-styleable name="ForecastFragment">
         <attr name="android:choiceMode" />
         <attr name="autoSelectView" format="boolean"/>
+        <attr name="sharedElementTransitions" format="boolean"/>
     </declare-styleable>
 </resources>
