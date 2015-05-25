@@ -29,7 +29,8 @@
         android:elevation="@dimen/appbar_elevation"
         android:layout_alignParentTop="true"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        />
 
     <ImageView
         android:id="@+id/sunshine_logo_imageview"
@@ -40,7 +41,8 @@
         android:src="@drawable/ic_logo"
         android:elevation="@dimen/appbar_elevation"
         android:background="@color/primary"
-        android:contentDescription="@string/app_name"/>
+        android:contentDescription="@string/app_name"
+        />
 
     <!-- This view is used to provide the area that is overlapped
          as well as the anchor point that the weather detail will
@@ -70,5 +72,7 @@
         android:layout_width="match_parent"
         android:layout_below="@id/weather_detail_container"
         tools:layout="@android:layout/list_content"
+        android:choiceMode="singleChoice"
+        app:autoSelectView="true"
         />
 </RelativeLayout>
