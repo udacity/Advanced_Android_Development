@@ -35,6 +35,13 @@
         android:entryValues="@array/pref_units_values"
         android:entries="@array/pref_units_options" />
 
+    <ListPreference
+        android:title="@string/pref_art_pack_label"
+        android:key="@string/pref_art_pack_key"
+        android:defaultValue="@string/pref_art_pack_sunshine"
+        android:entryValues="@array/pref_art_pack_values"
+        android:entries="@array/pref_art_pack_options" />
+
     <CheckBoxPreference
         android:title="@string/pref_enable_notifications_label"
         android:key="@string/pref_enable_notifications_key"

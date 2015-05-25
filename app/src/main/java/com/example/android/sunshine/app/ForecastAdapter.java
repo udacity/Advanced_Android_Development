@@ -108,7 +108,7 @@ public class ForecastAdapter extends CursorAdapter {
                 break;
             }
         }
-        
+
         Glide.with(mContext)
                 .load(Utility.getArtUrlForWeatherCondition(mContext, weatherId))
                 .error(fallbackIconId)
