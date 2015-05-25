@@ -140,6 +140,9 @@
     <string name="title_widget_today">Sunshine Today</string>
     <string name="title_widget_detail">Sunshine Details</string>
 
+    <!-- Strings related to Muzei Source -->
+    <string name="muzei_description">Today\'s weather</string>
+
     <!-- Empty Weather Database -->
     <string name="empty_forecast_list">No Weather Information Available</string>
     <string name="empty_forecast_list_no_network">No weather information available. The network is not available to fetch weather data.</string>
