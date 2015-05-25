@@ -21,8 +21,10 @@
     <color name="grey_700">#646464</color>
     <color name="black">#000000</color>
 
-    <color name="sunshine_light_blue">#ff64c2f4</color>
-    <color name="sunshine_blue">#ff1ca8f4</color>
-    <color name="sunshine_dark_blue">#0288D1</color>
+    <!-- using the "Light Blue" Material Palette -->
+    <color name="primary">#03A9F4</color>  <!-- 500 -->
+    <color name="primary_dark">#0288D1</color>  <!-- 700 -->
+    <color name="primary_light">#B3E5FC</color> <!-- 100 -->
+    <color name="accent">#FFD740</color>
 
 </resources>

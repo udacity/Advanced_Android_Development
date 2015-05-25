@@ -20,10 +20,10 @@
     </item>
 
     <item android:state_activated="true"
-        android:drawable="@color/sunshine_light_blue"/>
+        android:drawable="@color/primary_light"/>
 
     <item android:state_selected="true"
-        android:drawable="@color/sunshine_light_blue"/>
+        android:drawable="@color/primary_light"/>
 
-    <item android:drawable="@color/sunshine_blue" />
+    <item android:drawable="@color/primary" />
 </selector>
