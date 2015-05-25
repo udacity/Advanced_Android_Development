@@ -81,6 +81,9 @@
     <string name="pref_units_imperial" translatable="false">imperial</string>
 
 
+    <!-- Format for retrieving art from an external source [CHAR LIMIT=NONE] -->
+    <string name="format_art_url" translatable="false">https://raw.githubusercontent.com/udacity/Sunshine-Version-2/sunshine_master/app/src/main/res/drawable-xxhdpi/art_<xliff:g id="description">%s</xliff:g>.png</string>
+
     <!-- Language-specific constants -->
     <string name="today">Today</string>
 
