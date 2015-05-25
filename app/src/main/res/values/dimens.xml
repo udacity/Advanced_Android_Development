@@ -38,4 +38,9 @@
     <!-- Extra Padding -->
     <dimen name="detail_view_extra_padding">@dimen/abc_list_item_padding_horizontal_material</dimen>
 
+    <!-- Needed if we aren't including the Material Design Library -->
+    <dimen name="appbar_elevation">4dp</dimen>
+
+    <!-- The amount we want the details view to overlap the app bar -->
+    <dimen name="details_app_bar_overlap">24dp</dimen>
 </resources>
