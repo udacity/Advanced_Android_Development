@@ -205,4 +205,7 @@
     <string name="condition_962">Hurricane</string>
 
     <string name="condition_unknown">Unknown (<xliff:g id="low">%1$s</xliff:g>)</string>
+
+    <!-- Used to form a severe weather alert that reads "Heads up: <weather> in <location>!" -->
+    <string name="gcm_weather_alert">Heads up: %1$s in %2$s!</string>
 </resources>
