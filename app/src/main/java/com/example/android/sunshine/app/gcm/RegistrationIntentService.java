@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.android.sunshine.app.MainActivity;
 import com.example.android.sunshine.app.R;
@@ -47,9 +48,12 @@ public class RegistrationIntentService extends IntentService {
                 InstanceID instanceID = InstanceID.getInstance(this);
 
                 // TODO: gcm_default sender ID comes from the API console
-//                String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
-//                        GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-//                sendRegistrationToServer(token);
+                String senderId = getString(R.string.gcm_defaultSenderId);
+                if ( senderId.length() != 0 ) {
+                    String token = instanceID.getToken(senderId,
+                            GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+                    sendRegistrationToServer(token);
+                }
 
                 // You should store a boolean that indicates whether the generated token has been
                 // sent to your server. If the boolean is false, send the token to your server,
