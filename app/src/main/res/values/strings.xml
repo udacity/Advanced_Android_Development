@@ -207,5 +207,5 @@
     <string name="condition_unknown">Unknown (<xliff:g id="low">%1$s</xliff:g>)</string>
 
     // TODO: Get the SenderID from the Developer Console
-    <string name="gcm_defaultSenderId"></string>
+    <string name="gcm_defaultSenderId" translatable="false"></string>
 </resources>
