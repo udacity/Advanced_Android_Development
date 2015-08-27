@@ -54,8 +54,10 @@ public class MyGcmListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         // Time to unparcel the bundle!
         if (!data.isEmpty()) {
+            // TODO: gcm_default sender ID comes from the API console
+            String senderId = getString(R.string.gcm_defaultSenderId);
             // Not a bad idea to check that the message is coming from your server.
-            if ((getString(R.string.gcm_defaultSenderId)).equals(from)) {
+            if ((senderId).equals(from)) {
                 // Process message and then post a notification of the received message.
                 try {
                     JSONObject jsonObject = new JSONObject(data.getString(EXTRA_DATA));
