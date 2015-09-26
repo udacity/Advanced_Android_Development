@@ -1,4 +1,4 @@
-var PUSH_SERVER_URL = 'https://simple-push-demo.appspot.com';
+var PUSH_SERVER_URL = 'https://udacity-simple-push-demo.appspot.com';
 
 var registrationTextField = document.querySelector('.js-regid');
 var authorizationTextField = document.querySelector('.js-authkey');
