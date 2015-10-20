@@ -17,19 +17,19 @@ function sendPushMessage(registrationId, authorizationHeader, payload) {
   console.log('  RegID: ', registrationId);
   console.log('  AuthKey: ', authorizationHeader);
   console.log('  Payload: ', payload);
-  var formData = new FormData();
-  
-  formData.append('endpoint', 'https://android.googleapis.com/gcm/send');
-  formData.append('subscriptionId', registrationId);
-  formData.append('authorization', authorizationHeader);
-  formData.append('payload', payload);
-  
-  fetch(PUSH_SERVER_URL + '/send_push', {
+
+  formData = {
+    endpoint: 'https://android.googleapis.com/gcm/send',
+    subscriptionId: registrationId,
+    authorization: authorizationHeader,
+    payload: payload
+  };
+
+  $.ajax(PUSH_SERVER_URL + '/send_push', {
     method: 'post',
-    body: formData
-  }).then(function(response) {
-    console.log('Response = ', response);
-  }).catch(function(err) {
-    console.log('Fetch Error :-S', err);
+    data: $.param(formData),
+    success: function(data) {
+      console.log('Response = ', data);
+    }
   });
 }
