@@ -14,6 +14,22 @@ Getting Started
 This sample uses the Gradle build system.  To build this project, use the
 "gradlew build" command or use "Import Project" in Android Studio.
 
+Updates
+---------------
+The repository has been updated on:
+
+* **October 28th, 2015** - Updated to support use of the openweathermap.org API key.
+
+### Open Weather Map API Key is required.
+
+In order for the Sunshine app to function properly as of October 18th, 2015 an API key for openweathermap.org must be included with the build.
+
+We recommend that each student obtain a key via the following [instructions](http://openweathermap.org/appid#use), and include the unique key for the build by adding the following line to [USER_HOME]/.gradle/gradle.properties
+
+`MyOpenWeatherMapApiKey="<UNIQUE_API_KEY">`
+
+For help migrating an existing repo (fork or clone prior to 10/18/15), please check out this [guide.](https://docs.google.com/document/d/1e8LXahedBlCW1_dp_FyvQ3ugUAwUBJDuJCoKf3tgNVs/pub?embedded=true) 
+
 Support
 -------
 
