@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="widget_detail_enabled">false</bool>
+    <bool name="use_detail_activity">true</bool>
+</resources>
