@@ -173,8 +173,7 @@ public class SettingsActivity extends PreferenceActivity
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
                 String address = place.getAddress().toString();
-                // TODO(student): Get the LatLng object from the place -- this is a placeholder.
-                LatLng latLong = new LatLng(37.422503f, -122.083939f);
+                LatLng latLong = place.getLatLng();
 
                 // If the provided place doesn't have an address, we'll form a display-friendly
                 // string from the latlng values.
@@ -190,11 +189,10 @@ public class SettingsActivity extends PreferenceActivity
                 // Also store the latitude and longitude so that we can use these to get a precise
                 // result from our weather service. We cannot expect the weather service to
                 // understand addresses that Google formats.
-                // TODO(student) Store the latitude and longitude as float values according to the
-                // keys defined in strings.xml.
-
-
-
+                editor.putFloat(getString(R.string.pref_location_latitude),
+                        (float) latLong.latitude);
+                editor.putFloat(getString(R.string.pref_location_longitude),
+                        (float) latLong.longitude);
                 editor.commit();
 
                 // Tell the SyncAdapter that we've changed the location, so that we can update
