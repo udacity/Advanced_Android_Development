@@ -12,13 +12,15 @@
   <div class="form-container">
     
     <div class="mdl-textfield mdl-js-textfield">
-      <input class="mdl-textfield__input js-authkey" type="text" id="AuthKey" />
+      <input class="mdl-textfield__input js-authkey" type="text" id="AuthKey" pattern="^\d*[a-z][a-z\d]*$"/>
       <label class="mdl-textfield__label" for="AuthKey">Authorization Key</label>
+      <span class="mdl-textfield__error">The authorization key is not your project number.</span>
     </div>
     
     <div class="mdl-textfield mdl-js-textfield">
-      <input class="mdl-textfield__input js-regid" type="text" id="regID" />
+      <input class="mdl-textfield__input js-regid" type="text" id="regID" pattern="^\d*[a-z][a-z\d]*$"/>
       <label class="mdl-textfield__label" for="regID">Registration ID</label>
+      <span class="mdl-textfield__error">The registration ID is not your project number.</span>
     </div>
     
     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent js-send-push">Send Push Message</button>
