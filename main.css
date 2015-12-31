@@ -12,3 +12,7 @@
 .form-container > * {
   width: 100%;
 }
+
+.mdl-tooltip {
+    z-index: 1;
+}

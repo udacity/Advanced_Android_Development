@@ -6,23 +6,30 @@
   
   <link rel="stylesheet" type="text/css" href="main.css">
   <link rel="stylesheet" type="text/css" href="http://storage.googleapis.com/materialdesignlite/material.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-  
   <div class="form-container">
     
+    <div class="row">
     <div class="mdl-textfield mdl-js-textfield">
       <input class="mdl-textfield__input js-authkey" type="text" id="AuthKey" pattern="^\d*[a-z][a-z\d]*$"/>
       <label class="mdl-textfield__label" for="AuthKey">Authorization Key</label>
       <span class="mdl-textfield__error">The authorization key is not your project number.</span>
     </div>
-    
+    <i class="material-icons" id="AuthKeyHelp">help</i>
+    <span class="mdl-tooltip mdl-tooltip--large" for="AuthKeyHelp">This is the API key that you see from the same page that you download the google-services.json file.</span>
+    </div>
+
+    <div class="row">
     <div class="mdl-textfield mdl-js-textfield">
       <input class="mdl-textfield__input js-regid" type="text" id="regID" pattern="^\d*[a-z][a-z\d]*$"/>
       <label class="mdl-textfield__label" for="regID">Registration ID</label>
       <span class="mdl-textfield__error">The registration ID is not your project number.</span>
     </div>
-    
+    <i class="material-icons" id="RegIdHelp">help</i>
+    <span class="mdl-tooltip mdl-tooltip--large" for="RegIdHelp">This is the Instance ID from logcat.</span>
+    </div>
     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent js-send-push">Send Push Message</button>
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
