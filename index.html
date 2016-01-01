@@ -13,7 +13,7 @@
     
     <div class="row">
     <div class="mdl-textfield mdl-js-textfield">
-      <input class="mdl-textfield__input js-authkey" type="text" id="AuthKey" pattern="^\d*[a-z][a-z\d]*$"/>
+      <input class="mdl-textfield__input js-authkey" type="text" id="AuthKey" pattern=".*?[^0-9].*"/>
       <label class="mdl-textfield__label" for="AuthKey">Authorization Key</label>
       <span class="mdl-textfield__error">The authorization key is not your project number.</span>
     </div>
@@ -23,7 +23,7 @@
 
     <div class="row">
     <div class="mdl-textfield mdl-js-textfield">
-      <input class="mdl-textfield__input js-regid" type="text" id="regID" pattern="^\d*[a-z][a-z\d]*$"/>
+      <input class="mdl-textfield__input js-regid" type="text" id="regID" pattern=".*?[^0-9].*"/>
       <label class="mdl-textfield__label" for="regID">Registration ID</label>
       <span class="mdl-textfield__error">The registration ID is not your project number.</span>
     </div>
