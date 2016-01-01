@@ -5,6 +5,7 @@ var authorizationTextField = document.querySelector('.js-authkey');
 
 var sendPushViaXHRButton = document.querySelector('.js-send-push');
 sendPushViaXHRButton.addEventListener('click', function(e) {
+  $('.mdl-spinner').addClass('is-active');
   var registrationId = registrationTextField.value;
   var authorization = authorizationTextField.value;
   var payload = '{"location": "LA", "weather": "Sharknado"}';
@@ -30,6 +31,8 @@ function sendPushMessage(registrationId, authorizationHeader, payload) {
     data: $.param(formData),
     success: function(data) {
       console.log('Response = ', data);
+      $('.mdl-spinner').removeClass('is-active');
+      $('.send_push_api_response').html('<p>Response:</p><p>' + data + '</p>');
     }
   });
 }
