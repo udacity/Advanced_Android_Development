@@ -505,6 +505,10 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
+    private void updateWatches()
+    {
+
+    }
     /**
      * Helper method to handle insertion of a new location in the weather database.
      *
