@@ -147,6 +147,9 @@
     <string name="title_widget_today">Sunshine Today</string>
     <string name="title_widget_detail">Sunshine Details</string>
 
+    <!-- Strings related to Watch -->
+    <string name="title_watch_today">Sunshine Watch Today</string>
+
     <!-- Strings related to Muzei Source -->
     <string name="muzei_description">Today\'s weather</string>
 

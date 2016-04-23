@@ -35,11 +35,12 @@ import com.example.android.sunshine.app.MainActivity;
 import com.example.android.sunshine.app.R;
 import com.example.android.sunshine.app.Utility;
 import com.example.android.sunshine.app.data.WeatherContract;
-import com.example.android.sunshine.app.widget.TodayWidgetProvider;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 /**
@@ -74,13 +75,15 @@ public class TodayWatchIntentService extends IntentService implements GoogleApiC
 //        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this,
 //                TodayWidgetProvider.class));
         //setup api client to watch
-        mPeerId = intent.getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
+//        intent.getStringExtra()
+        //mPeerId = intent.getStringExtra(WatchFaceCompanion.EXTRA_PEER_ID);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Wearable.API)
                 .build();
 
+        mGoogleApiClient.connect();
 
         // Get today's data from the ContentProvider
         String location = Utility.getPreferredLocation(this);
@@ -107,43 +110,6 @@ public class TodayWatchIntentService extends IntentService implements GoogleApiC
         data.close();
 
         //send data to the watch
-
-
-
-        // Perform this loop procedure for each Today widget
-        for (int appWidgetId : appWidgetIds) {
-            // Find the correct layout based on the widget's width
-            int widgetWidth = getWidgetWidth(appWidgetManager, appWidgetId);
-            int defaultWidth = getResources().getDimensionPixelSize(R.dimen.widget_today_default_width);
-            int largeWidth = getResources().getDimensionPixelSize(R.dimen.widget_today_large_width);
-            int layoutId;
-            if (widgetWidth >= largeWidth) {
-                layoutId = R.layout.widget_today_large;
-            } else if (widgetWidth >= defaultWidth) {
-                layoutId = R.layout.widget_today;
-            } else {
-                layoutId = R.layout.widget_today_small;
-            }
-            RemoteViews views = new RemoteViews(getPackageName(), layoutId);
-
-            // Add the data to the RemoteViews
-            views.setImageViewResource(R.id.widget_icon, weatherArtResourceId);
-            // Content Descriptions for RemoteViews were only added in ICS MR1
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                setRemoteContentDescription(views, description);
-            }
-            views.setTextViewText(R.id.widget_description, description);
-            views.setTextViewText(R.id.widget_high_temperature, formattedMaxTemperature);
-            views.setTextViewText(R.id.widget_low_temperature, formattedMinTemperature);
-
-            // Create an Intent to launch MainActivity
-            Intent launchIntent = new Intent(this, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, 0);
-            views.setOnClickPendingIntent(R.id.widget, pendingIntent);
-
-            // Tell the AppWidgetManager to perform an update on the current app widget
-            appWidgetManager.updateAppWidget(appWidgetId, views);
-        }
     }
 
     private int getWidgetWidth(AppWidgetManager appWidgetManager, int appWidgetId) {
@@ -176,6 +142,41 @@ public class TodayWatchIntentService extends IntentService implements GoogleApiC
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+
+        //send the weather data to the watch
+        // Get today's data from the ContentProvider
+        String location = Utility.getPreferredLocation(this);
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                location, System.currentTimeMillis());
+        Cursor data = getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null,
+                null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+        if (data == null) {
+            return;
+        }
+        if (!data.moveToFirst()) {
+            data.close();
+            return;
+        }
+
+        // Extract the weather data from the Cursor
+        int weatherId = data.getInt(INDEX_WEATHER_ID);
+        int weatherArtResourceId = Utility.getArtResourceForWeatherCondition(weatherId);
+        String description = data.getString(INDEX_SHORT_DESC);
+        double maxTemp = data.getDouble(INDEX_MAX_TEMP);
+        double minTemp = data.getDouble(INDEX_MIN_TEMP);
+        String formattedMaxTemperature = Utility.formatTemperature(this, maxTemp);
+        String formattedMinTemperature = Utility.formatTemperature(this, minTemp);
+        data.close();
+
+        PutDataMapRequest mapRequest = PutDataMapRequest.create("/sunshine/today");
+        mapRequest.getDataMap().putString("Test1", description);
+        mapRequest.getDataMap().putString("Test2", formattedMaxTemperature);
+        mapRequest.getDataMap().putString("Test3", formattedMinTemperature);
+
+        PutDataRequest request = mapRequest.asPutDataRequest();
+
+        DataApi.DataItemResult dataItemResult = Wearable.DataApi
+                .putDataItem(mGoogleApiClient,request).await();
 
     }
 

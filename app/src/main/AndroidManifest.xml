@@ -144,6 +144,14 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info_today" />
         </receiver>
+        <!--android wear Watch -->
+        <receiver
+            android:name=".watch.TodayWatchProvider"
+            android:label="@string/title_watch_today">
+            <intent-filter>
+                <action android:name="com.example.android.sunshine.app.ACTION_DATA_UPDATED" />
+            </intent-filter>
+        </receiver>
 
         <service android:name=".widget.TodayWidgetIntentService" />
         <!-- Detail Widget -->

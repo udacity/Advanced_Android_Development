@@ -36,6 +36,8 @@ import com.example.android.sunshine.app.R;
 import com.example.android.sunshine.app.Utility;
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.muzei.WeatherMuzeiSource;
+import com.example.android.sunshine.app.watch.TodayWatchIntentService;
+import com.example.android.sunshine.app.watch.TodayWatchProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,6 +58,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
     public static final String ACTION_DATA_UPDATED =
             "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
+
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
     public static final int SYNC_INTERVAL = 60 * 180;
@@ -369,6 +372,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 updateWidgets();
                 updateMuzei();
                 notifyWeather();
+                updateWatches();
             }
             Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
             setLocationStatus(getContext(), LOCATION_STATUS_OK);
@@ -507,7 +511,9 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void updateWatches()
     {
-
+        Context context = getContext();
+        context.startService(new Intent(ACTION_DATA_UPDATED)
+                .setClass(context, TodayWatchIntentService.class));
     }
     /**
      * Helper method to handle insertion of a new location in the weather database.
