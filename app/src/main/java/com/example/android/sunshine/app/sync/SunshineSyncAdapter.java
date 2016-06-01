@@ -24,6 +24,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.format.Time;
@@ -38,6 +40,13 @@ import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.muzei.WeatherMuzeiSource;
 import com.example.android.sunshine.app.watch.TodayWatchIntentService;
 import com.example.android.sunshine.app.watch.TodayWatchProvider;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,10 +63,21 @@ import java.net.URL;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
-public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
+public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
     public static final String ACTION_DATA_UPDATED =
             "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
+
+    private static final String[] FORECAST_COLUMNS = {
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
+            WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
+            WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
+    };
+
+    //variables to send data to the android wear
+    private GoogleApiClient mGoogleApiClient;
+    private String mPeerId;
 
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
@@ -80,6 +100,61 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INDEX_MIN_TEMP = 2;
     private static final int INDEX_SHORT_DESC = 3;
 
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        Log.d(LOG_TAG, "onConnected: " + bundle);
+        // Now you can use the Data Layer API
+//        Context context = getContext();
+//        //send the weather data to the watch
+//        // Get today's data from the ContentProvider
+//        String location = Utility.getPreferredLocation(context);
+//        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+//                location, System.currentTimeMillis());
+//        Cursor data = context.getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null,
+//                null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+//        if (data == null) {
+//            return;
+//        }
+//        if (!data.moveToFirst()) {
+//            data.close();
+//            return;
+//        }
+//
+//        // Extract the weather data from the Cursor
+//        int weatherId = data.getInt(INDEX_WEATHER_ID);
+//        int weatherArtResourceId = Utility.getArtResourceForWeatherCondition(weatherId);
+//        String description = data.getString(INDEX_SHORT_DESC);
+//        double maxTemp = data.getDouble(INDEX_MAX_TEMP);
+//        double minTemp = data.getDouble(INDEX_MIN_TEMP);
+//        String formattedMaxTemperature = Utility.formatTemperature(context, maxTemp);
+//        String formattedMinTemperature = Utility.formatTemperature(context, minTemp);
+//        data.close();
+//
+//        PutDataMapRequest mapRequest = PutDataMapRequest.create("/sunshine/today");
+//        mapRequest.getDataMap().putString("Test1", description);
+//        mapRequest.getDataMap().putString("Test2", formattedMaxTemperature);
+//        mapRequest.getDataMap().putString("Test3", formattedMinTemperature);
+//
+//        PutDataRequest request = mapRequest.asPutDataRequest();
+//
+//        DataApi.DataItemResult dataItemResult = Wearable.DataApi
+//                .putDataItem(mGoogleApiClient,request).await();
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+
+        Log.d(LOG_TAG, "onConnectionSuspended: " + cause);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(LOG_TAG, "onConnectionFailed: " + connectionResult);
+
+    }
+
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
     public @interface LocationStatus {}
@@ -92,6 +167,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public SunshineSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+
+        initGoogleApiClient();
     }
 
     @Override
@@ -509,11 +586,71 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
+    private int count = 0;
+    private static final String TAG = "MOBILE_MAIN";
+    private static final String COUNT_KEY = "com.example.key.count";
+    // Create a data map and put data in it
+    private void increaseCounter() {
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/count");
+        putDataMapReq.getDataMap().putInt(COUNT_KEY, count++);
+        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+        PendingResult<DataApi.DataItemResult> pendingResult =
+                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
+
+        Log.d(LOG_TAG, "increase Counter: " + pendingResult.toString());
+
+    }
     private void updateWatches()
     {
-        Context context = getContext();
-        context.startService(new Intent(ACTION_DATA_UPDATED)
-                .setClass(context, TodayWatchIntentService.class));
+        increaseCounter();
+        return;
+        //send the weather data to the watch
+        // Get today's data from the ContentProvider
+//        String location = Utility.getPreferredLocation(context);
+//        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+//                location, System.currentTimeMillis());
+//        Cursor data = context.getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null,
+//                null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+//        if (data == null) {
+//            return;
+//        }
+//        if (!data.moveToFirst()) {
+//            data.close();
+//            return;
+//        }
+//
+//        // Extract the weather data from the Cursor
+//        int weatherId = data.getInt(INDEX_WEATHER_ID);
+//        int weatherArtResourceId = Utility.getArtResourceForWeatherCondition(weatherId);
+//        String description = data.getString(INDEX_SHORT_DESC);
+//        double maxTemp = data.getDouble(INDEX_MAX_TEMP);
+//        double minTemp = data.getDouble(INDEX_MIN_TEMP);
+//        String formattedMaxTemperature = Utility.formatTemperature(context, maxTemp);
+//        String formattedMinTemperature = Utility.formatTemperature(context, minTemp);
+//        data.close();
+//
+//        PutDataMapRequest mapRequest = PutDataMapRequest.create("/sunshine/today");
+//        mapRequest.getDataMap().putString("Test1", description);
+//        mapRequest.getDataMap().putString("Test2", formattedMaxTemperature);
+//        mapRequest.getDataMap().putString("Test3", formattedMinTemperature);
+//
+//        PutDataRequest request = mapRequest.asPutDataRequest();
+//
+//        DataApi.DataItemResult dataItemResult = Wearable.DataApi
+//                .putDataItem(mGoogleApiClient,request).await();
+//
+//        Log.d(LOG_TAG, "DataItemResult(" + dataItemResult.toString() +")");
+    }
+
+    private void initGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this.getContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                // Request access only to the Wearable API
+                .addApi(Wearable.API)
+                .build();
+
+        mGoogleApiClient.connect();
     }
     /**
      * Helper method to handle insertion of a new location in the weather database.

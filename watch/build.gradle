@@ -4,8 +4,9 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
+
     defaultConfig {
-        applicationId 'com.example.android.sunshine.app'
+        applicationId "com.example.android.sunshine.app"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
@@ -17,12 +18,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    productFlavors {
+}
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
     }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.android.support:wearable:2.0.0-alpha1'
     compile 'com.google.android.gms:play-services-wearable:9.0.0'
 }

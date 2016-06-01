@@ -39,9 +39,11 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 public class LocationEditTextPreference extends EditTextPreference {
     static final private int DEFAULT_MINIMUM_LOCATION_LENGTH = 2;
     private int mMinLength;
+    private Context mContext;
 
     public LocationEditTextPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
                 R.styleable.LocationEditTextPreference,
@@ -84,7 +86,7 @@ public class LocationEditTextPreference extends EditTextPreference {
                 Activity settingsActivity = (SettingsActivity) context;
                 try {
                     settingsActivity.startActivityForResult(
-                            builder.build(context), SettingsActivity.PLACE_PICKER_REQUEST);
+                            builder.build((Activity) mContext), SettingsActivity.PLACE_PICKER_REQUEST);
 
                 } catch (GooglePlayServicesNotAvailableException
                         | GooglePlayServicesRepairableException e) {

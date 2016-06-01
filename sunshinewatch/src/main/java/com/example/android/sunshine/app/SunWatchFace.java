@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.sunshinewatch;
+package com.example.android.sunshine.app;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -31,14 +31,30 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import com.example.sunshinewatch.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.Wearable;
+
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -86,7 +102,7 @@ public class SunWatchFace extends CanvasWatchFaceService {
         }
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine {
+    private class Engine extends CanvasWatchFaceService.Engine implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, DataApi.DataListener  {
         final Handler mUpdateTimeHandler = new EngineHandler(this);
         boolean mRegisteredTimeZoneReceiver = false;
         Paint mBackgroundPaint;
@@ -118,7 +134,11 @@ public class SunWatchFace extends CanvasWatchFaceService {
         private float mImageXOffset;
         private float mImageYOffset;
         //private float mCenterY;
+        private GoogleApiClient mGoogleApiClient;
 
+        private static final String TAG = "WEAR_MAIN";
+
+        private static final String COUNT_KEY = "com.example.key.count";
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
@@ -133,6 +153,7 @@ public class SunWatchFace extends CanvasWatchFaceService {
         Paint mTemperaturePaint;
         Paint mDatePaint;
 
+        private String mCount;
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
@@ -160,6 +181,8 @@ public class SunWatchFace extends CanvasWatchFaceService {
             mDatePaint = createTextPaint(ContextCompat.getColor(getApplicationContext(),R.color.digital_date_text));
 
             mTime = new Time();
+
+            initGoogleApiClient();
         }
 
         @Override
@@ -349,10 +372,10 @@ public class SunWatchFace extends CanvasWatchFaceService {
             String temperatureStr = "75/43";
             String dateStr = "4/23/15";
 
-            canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
+            canvas.drawText(mCount, mXOffset, mYOffset, mTextPaint);
             //canvas.drawText(dateStr, mDateXOffset, mYOffset + 75, mDatePaint);
-            canvas.drawText(dateStr, mDateXOffset, mDateYOffset, mDatePaint);
-            canvas.drawText(temperatureStr, mTemperatureXOffset, mTemperatureYOffset, mTemperaturePaint);
+            canvas.drawText(dateStr, mDateXOffset + 5, mDateYOffset, mDatePaint);
+            canvas.drawText(temperatureStr, mTemperatureXOffset + 10, mTemperatureYOffset, mTemperaturePaint);
 
 
         }
@@ -388,5 +411,78 @@ public class SunWatchFace extends CanvasWatchFaceService {
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
         }
+
+        @Override
+        public void onConnected(@Nullable Bundle bundle) {
+
+            Log.d(TAG, "onConnected: " + bundle);
+            // Now you can use the Data Layer API
+
+            Wearable.DataApi.addListener(mGoogleApiClient, this);
+        }
+
+        @Override
+        public void onConnectionSuspended(int cause) {
+
+            Log.d(TAG, "onConnectionSuspended: " + cause);
+        }
+
+        @Override
+        public void onDataChanged(DataEventBuffer dataEvents) {
+            for (DataEvent event : dataEvents) {
+                if (event.getType() == DataEvent.TYPE_CHANGED) {
+                    // DataItem changed
+                    DataItem item = event.getDataItem();
+                    if (item.getUri().getPath().compareTo("/count") == 0) {
+                        DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                        updateCount(dataMap.getInt(COUNT_KEY));
+                    }
+                } else if (event.getType() == DataEvent.TYPE_DELETED) {
+                    // DataItem deleted
+                }
+            }
+        }
+
+        @Override
+        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+            Log.d(TAG, "onConnectionFailed: " + connectionResult);
+
+        }
+
+        private void initGoogleApiClient() {
+            mGoogleApiClient = new GoogleApiClient.Builder(SunWatchFace.this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    // Request access only to the Wearable API
+                    .addApi(Wearable.API)
+                    .build();
+        }
+
+        private void updateCount(int c) {
+            this.mCount = "Count:" + c;
+            this.invalidate();
+            //this.mTextView.setText("Current Count:"+c);
+        }
+//        @Override
+//        public void onConnected(@Nullable Bundle bundle) {
+//
+//            Log.d("SUNSHINE_WEARABLE", "Connected");
+//        }
+//
+//        @Override
+//        public void onConnectionSuspended(int i) {
+//
+//        }
+//
+//        @Override
+//        public void onDataChanged(DataEventBuffer dataEventBuffer) {
+//
+//            Log.d("SUNSHINE_WEARABLE", "DataEventBuffer On Data Changed" + dataEventBuffer.toString());
+//        }
+//
+//        @Override
+//        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+//
+//        }
     }
 }
