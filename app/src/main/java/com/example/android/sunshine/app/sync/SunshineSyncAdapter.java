@@ -96,8 +96,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
 
     // these indices must match the projection
     private static final int INDEX_WEATHER_ID = 0;
-    private static final int INDEX_MAX_TEMP = 1;
-    private static final int INDEX_MIN_TEMP = 2;
+    private static final int INDEX_MIN_TEMP = 1;
+    private static final int INDEX_MAX_TEMP = 2;
     private static final int INDEX_SHORT_DESC = 3;
 
     @Override
@@ -449,7 +449,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
                 updateWidgets();
                 updateMuzei();
                 notifyWeather();
-                updateWatches();
+                updateWatches(1.2, 3.4);
             }
             Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
             setLocationStatus(getContext(), LOCATION_STATUS_OK);
@@ -588,21 +588,49 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
 
     private int count = 0;
     private static final String TAG = "MOBILE_MAIN";
+    private static final String FORCAST_KEY = "/forecast";
+    private static final String TODAY_HI_TEMP = "TODAY_HI_TEMP";
+    private static final String TODAY_LOW_TEMP = "TODAY_LOW_TEMP";
+
+
     private static final String COUNT_KEY = "com.example.key.count";
-    // Create a data map and put data in it
-    private void increaseCounter() {
-        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/count");
-        putDataMapReq.getDataMap().putInt(COUNT_KEY, count++);
+
+    private void updateWatches(double hi, double low)
+    {
+        Context context = this.getContext();
+
+        String location = Utility.getPreferredLocation(context);
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                location, System.currentTimeMillis());
+        Cursor data = context.getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null,
+                null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+        if (data == null) {
+            return;
+        }
+        if (!data.moveToFirst()) {
+            data.close();
+            return;
+        }
+
+        // Extract the weather data from the Cursor
+        int weatherId = data.getInt(INDEX_WEATHER_ID);
+        int weatherArtResourceId = Utility.getArtResourceForWeatherCondition(weatherId);
+        String description = data.getString(INDEX_SHORT_DESC);
+        double maxTemp = data.getDouble(INDEX_MAX_TEMP);
+        double minTemp = data.getDouble(INDEX_MIN_TEMP);
+        String formattedMaxTemperature = Utility.formatTemperature(context, maxTemp);
+        String formattedMinTemperature = Utility.formatTemperature(context, minTemp);
+        data.close();
+
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create(FORCAST_KEY);
+        putDataMapReq.getDataMap().putString(TODAY_HI_TEMP, formattedMaxTemperature);
+        putDataMapReq.getDataMap().putString(TODAY_LOW_TEMP, formattedMinTemperature);
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
 
-        Log.d(LOG_TAG, "increase Counter: " + pendingResult.toString());
+        Log.d(LOG_TAG, "sent hi and low temp: " + pendingResult.toString());
 
-    }
-    private void updateWatches()
-    {
-        increaseCounter();
         return;
         //send the weather data to the watch
         // Get today's data from the ContentProvider

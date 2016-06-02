@@ -133,6 +133,7 @@ public class SunWatchFace extends CanvasWatchFaceService {
         private float mCenterX;
         private float mImageXOffset;
         private float mImageYOffset;
+
         //private float mCenterY;
         private GoogleApiClient mGoogleApiClient;
 

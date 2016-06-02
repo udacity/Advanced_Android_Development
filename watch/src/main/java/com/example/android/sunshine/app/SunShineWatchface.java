@@ -31,6 +31,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
@@ -90,6 +91,9 @@ public class SunShineWatchface extends CanvasWatchFaceService {
 
         Paint mBackgroundPaint;
         Paint mTextPaint;
+        Paint mTemperaturePaint;
+        Paint mDatePaint;
+
 
         boolean mAmbient;
         Time mTime;
@@ -97,16 +101,26 @@ public class SunShineWatchface extends CanvasWatchFaceService {
         float mXOffset;
         float mYOffset;
 
+        float mTemperatureXOffset;
+        float mTemperatureYOffset;
+
+        float mDateXOffset;
+        float mDateYOffset;
+
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
          */
         boolean mLowBitAmbient;
         private String mCount = "count:0";
+        private String mHiTemp = "Hi:0";
+        private String mLowTemp = "Low:0";
         private GoogleApiClient mGoogleApiClient;
         private static final String TAG = "WEAR_MAIN";
 
-        private static final String COUNT_KEY = "com.example.key.count";
+        private static final String TODAY_HI_TEMP = "TODAY_HI_TEMP";
+        private static final String TODAY_LOW_TEMP = "TODAY_LOW_TEMP";
+        private static final String FORCAST_KEY = "/forecast";
 
 
         @Override
@@ -126,6 +140,12 @@ public class SunShineWatchface extends CanvasWatchFaceService {
 
             mTextPaint = new Paint();
             mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
+
+            mTemperaturePaint = new Paint();
+            mTemperaturePaint = createTextPaint(ContextCompat.getColor(getApplicationContext(),R.color.digital_text));
+
+            mDatePaint = new Paint();
+            mDatePaint = createTextPaint(ContextCompat.getColor(getApplicationContext(),R.color.digital_date_text));
 
             mTime = new Time();
             initGoogleApiClient();
@@ -195,12 +215,36 @@ public class SunShineWatchface extends CanvasWatchFaceService {
             // Load resources that have alternate values for round watches.
             Resources resources = SunShineWatchface.this.getResources();
             boolean isRound = insets.isRound();
-            mXOffset = resources.getDimension(isRound
-                    ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
-            float textSize = resources.getDimension(isRound
-                    ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
+            float temperatureTextSize;
+            float textSize;
+            float dateTextSize;
+
+            if(isRound)
+            {
+
+                mXOffset = resources.getDimension(R.dimen.digital_x_offset_round);
+                mDateXOffset = resources.getDimension(R.dimen.date_x_offset_round);
+                mTemperatureXOffset = resources.getDimension(R.dimen.temperature_x_offset_round);
+
+                textSize = resources.getDimension(R.dimen.digital_text_size_round);
+                dateTextSize = resources.getDimension(R.dimen.date_text_size_round);
+                temperatureTextSize = resources.getDimension(R.dimen.temperature_text_size_round);
+            }
+            else
+            {
+                mXOffset = resources.getDimension(R.dimen.digital_x_offset);
+                mDateXOffset = resources.getDimension(R.dimen.date_x_offset);
+                mTemperatureXOffset = resources.getDimension(R.dimen.temperature_x_offset);
+
+                textSize = resources.getDimension(R.dimen.digital_text_size);
+                dateTextSize = resources.getDimension(R.dimen.date_text_size);
+                temperatureTextSize = resources.getDimension(R.dimen.temperature_text_size);
+            }
+            mTemperatureYOffset = resources.getDimension(R.dimen.temperature_y_offset);
 
             mTextPaint.setTextSize(textSize);
+            mDatePaint.setTextSize(dateTextSize);
+            mTemperaturePaint.setTextSize(temperatureTextSize);
         }
 
         @Override
@@ -222,6 +266,8 @@ public class SunShineWatchface extends CanvasWatchFaceService {
                 mAmbient = inAmbientMode;
                 if (mLowBitAmbient) {
                     mTextPaint.setAntiAlias(!inAmbientMode);
+                    mDatePaint.setAntiAlias(!inAmbientMode);
+                    mTemperaturePaint.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
             }
@@ -245,7 +291,14 @@ public class SunShineWatchface extends CanvasWatchFaceService {
             String text = mAmbient
                     ? String.format("%d:%02d", mTime.hour, mTime.minute)
                     : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
-            canvas.drawText(mCount, mXOffset, mYOffset, mTextPaint);
+            String dateStr = "4/23/15";
+
+            dateStr = String.format("%d/%d/%d", mTime.month, mTime.monthDay, mTime.year);
+            canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
+            canvas.drawText(dateStr, mDateXOffset + 5, mDateYOffset, mDatePaint);
+
+            canvas.drawText(this.mHiTemp + "/" + this.mLowTemp, mTemperatureXOffset + 10, mTemperatureYOffset, mTemperaturePaint);
+
         }
 
         /**
@@ -301,9 +354,13 @@ public class SunShineWatchface extends CanvasWatchFaceService {
                 if (event.getType() == DataEvent.TYPE_CHANGED) {
                     // DataItem changed
                     DataItem item = event.getDataItem();
-                    if (item.getUri().getPath().compareTo("/count") == 0) {
+                    if (item.getUri().getPath().compareTo(FORCAST_KEY) == 0)
+                    {
                         DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                        updateCount(dataMap.getInt(COUNT_KEY));
+
+                        String tempHi = dataMap.getString(TODAY_HI_TEMP);
+                        String tempLow = dataMap.getString(TODAY_LOW_TEMP);
+                        updateForecast(tempHi, tempLow);
                     }
                 } else if (event.getType() == DataEvent.TYPE_DELETED) {
                     // DataItem deleted
@@ -325,8 +382,9 @@ public class SunShineWatchface extends CanvasWatchFaceService {
                     .build();
         }
 
-        private void updateCount(int c) {
-            this.mCount = "Count:" + c;
+        private void updateForecast(String hi, String low) {
+            this.mHiTemp = hi;
+            this.mLowTemp = low;
             this.invalidate();
             //this.mTextView.setText("Current Count:"+c);
         }
