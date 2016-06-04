@@ -662,8 +662,9 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
      * @return Asset
      */
     private static Asset createAssetFromBitmap(Bitmap bitmap) {
+        //bitmap = Bitmap.createScaledBitmap(bitmap,)
         final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 60, byteStream);
         return Asset.createFromBytes(byteStream.toByteArray());
     }
 

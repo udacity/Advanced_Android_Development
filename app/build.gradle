@@ -26,18 +26,18 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    wearApp project(':watch')
     compile 'com.github.bumptech.glide:glide:3.5.2'
-    compile 'com.android.support:support-annotations:23.3.0'
-    compile 'com.android.support:gridlayout-v7:23.3.0'
-    compile 'com.android.support:cardview-v7:23.3.0'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
-    compile 'com.android.support:recyclerview-v7:23.3.0'
+    compile 'com.android.support:support-annotations:24.0.0-alpha2'
+    compile 'com.android.support:gridlayout-v7:24.0.0-alpha2'
+    compile 'com.android.support:cardview-v7:24.0.0-alpha2'
+    compile 'com.android.support:appcompat-v7:24.0.0-alpha2'
+    compile 'com.android.support:design:24.0.0-alpha2'
+    compile 'com.android.support:recyclerview-v7:24.0.0-alpha2'
     compile 'com.google.android.support:wearable:2.0.0-alpha1'
     compile 'com.google.android.apps.muzei:muzei-api:2.0'
     compile 'com.google.firebase:firebase-messaging:9.0.0'
     compile 'com.google.android.gms:play-services-location:9.0.0'
     compile 'com.google.android.gms:play-services-gcm:9.0.0'
     compile 'com.google.android.gms:play-services-wearable:9.0.0'
-    wearApp project(':watch')
 }

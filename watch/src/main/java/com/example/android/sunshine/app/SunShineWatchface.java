@@ -28,6 +28,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -114,8 +115,8 @@ public class SunShineWatchface extends CanvasWatchFaceService {
 
         //image coordinates
         private float mCenterX;
-        private float mImageXOffset;
         private float mImageYOffset;
+        private float mImageScaling;
 
         /**
          * Weather bitmap
@@ -128,8 +129,8 @@ public class SunShineWatchface extends CanvasWatchFaceService {
          */
         boolean mLowBitAmbient;
         private String mCount = "count:0";
-        private String mHiTemp = "90";
-        private String mLowTemp = "40";
+        private String mHiTemp = "";
+        private String mLowTemp = "";
         private GoogleApiClient mGoogleApiClient;
         private static final String TAG = "WEAR_MAIN";
 
@@ -259,10 +260,18 @@ public class SunShineWatchface extends CanvasWatchFaceService {
             }
             mTemperatureYOffset = resources.getDimension(R.dimen.temperature_y_offset);
             mDateYOffset = resources.getDimension(R.dimen.date_y_offset);
+            mImageScaling = resources.getDimension(R.dimen.weather_img_scaling);
+            mImageYOffset = resources.getDimension(R.dimen.weather_img_y_offset);
 
             mTextPaint.setTextSize(textSize);
             mDatePaint.setTextSize(dateTextSize);
             mTemperaturePaint.setTextSize(temperatureTextSize);
+        }
+
+        @Override
+        public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            super.onSurfaceChanged(holder, format, width, height);
+            mCenterX = width / 2.0f;
         }
 
         @Override
@@ -310,7 +319,7 @@ public class SunShineWatchface extends CanvasWatchFaceService {
             } else {
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
                 if(mWeatherBitmap != null) {
-                    canvas.drawBitmap(mWeatherBitmap, mImageXOffset, mImageYOffset, mBackgroundPaint);
+                    canvas.drawBitmap(mWeatherBitmap, mCenterX + (mWeatherBitmap.getWidth()/2) , mImageYOffset, mBackgroundPaint);
                 }
             }
 
@@ -331,7 +340,9 @@ public class SunShineWatchface extends CanvasWatchFaceService {
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
             canvas.drawText(dateStr, mDateXOffset, mDateYOffset, mDatePaint);
 
-            canvas.drawText(this.mHiTemp + "/" + this.mLowTemp, mTemperatureXOffset, mTemperatureYOffset, mTemperaturePaint);
+            if(!this.mHiTemp.isEmpty() && !this.mLowTemp.isEmpty()) {
+                canvas.drawText(this.mHiTemp + "/" + this.mLowTemp, mTemperatureXOffset, mTemperatureYOffset, mTemperaturePaint);
+            }
 
         }
 
@@ -394,8 +405,10 @@ public class SunShineWatchface extends CanvasWatchFaceService {
 
                         String tempHi = dataMap.getString(TODAY_HI_TEMP);
                         String tempLow = dataMap.getString(TODAY_LOW_TEMP);
-                        Asset weathImgAsset = dataMap.getAsset(TODAY_WEATHER_IMG);
-                        mWeatherBitmap = loadBitmapFromAsset(weathImgAsset);
+                        Asset weatherImgAsset = dataMap.getAsset(TODAY_WEATHER_IMG);
+                        if(weatherImgAsset != null) {
+                            new GetBitmapTask().execute(weatherImgAsset);
+                        }
                         updateForecast(tempHi, tempLow);
                     }
                 } else if (event.getType() == DataEvent.TYPE_DELETED) {
@@ -404,7 +417,7 @@ public class SunShineWatchface extends CanvasWatchFaceService {
             }
         }
 
-        public Bitmap loadBitmapFromAsset(Asset asset) {
+        public Bitmap getWeatherBitmapFromAsset(Asset asset) {
             if (asset == null) {
                 throw new IllegalArgumentException("Asset must be non-null");
             }
@@ -446,6 +459,25 @@ public class SunShineWatchface extends CanvasWatchFaceService {
             this.invalidate();
             //this.mTextView.setText("Current Count:"+c);
         }
+        private class GetBitmapTask extends AsyncTask<Asset, Void, Void>
+        {
+
+            @Override
+            protected Void doInBackground(Asset... params) {
+
+                Bitmap temp = getWeatherBitmapFromAsset(params[0]);
+                mWeatherBitmap = Bitmap.createScaledBitmap(temp,
+                        (int) (temp.getWidth() * 0.4),
+                        (int) (temp.getHeight() * 0.4), false);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                invalidate();
+            }
+        }
 
     }
 
@@ -468,4 +500,5 @@ public class SunShineWatchface extends CanvasWatchFaceService {
             }
         }
     }
+
 }
