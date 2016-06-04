@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -41,6 +43,7 @@ import android.view.WindowInsets;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
@@ -49,6 +52,7 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -107,20 +111,34 @@ public class SunShineWatchface extends CanvasWatchFaceService {
         float mDateXOffset;
         float mDateYOffset;
 
+
+        //image coordinates
+        private float mCenterX;
+        private float mImageXOffset;
+        private float mImageYOffset;
+
+        /**
+         * Weather bitmap
+         */
+        private Bitmap mWeatherBitmap;
+
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
          */
         boolean mLowBitAmbient;
         private String mCount = "count:0";
-        private String mHiTemp = "Hi:0";
-        private String mLowTemp = "Low:0";
+        private String mHiTemp = "90";
+        private String mLowTemp = "40";
         private GoogleApiClient mGoogleApiClient;
         private static final String TAG = "WEAR_MAIN";
 
         private static final String TODAY_HI_TEMP = "TODAY_HI_TEMP";
         private static final String TODAY_LOW_TEMP = "TODAY_LOW_TEMP";
+        private static final String TODAY_WEATHER_IMG = "TODAY_WEATHER_IMG";
         private static final String FORCAST_KEY = "/forecast";
+        private static final int TIMEOUT_MS = 5000;
+
 
 
         @Override
@@ -221,7 +239,6 @@ public class SunShineWatchface extends CanvasWatchFaceService {
 
             if(isRound)
             {
-
                 mXOffset = resources.getDimension(R.dimen.digital_x_offset_round);
                 mDateXOffset = resources.getDimension(R.dimen.date_x_offset_round);
                 mTemperatureXOffset = resources.getDimension(R.dimen.temperature_x_offset_round);
@@ -241,6 +258,7 @@ public class SunShineWatchface extends CanvasWatchFaceService {
                 temperatureTextSize = resources.getDimension(R.dimen.temperature_text_size);
             }
             mTemperatureYOffset = resources.getDimension(R.dimen.temperature_y_offset);
+            mDateYOffset = resources.getDimension(R.dimen.date_y_offset);
 
             mTextPaint.setTextSize(textSize);
             mDatePaint.setTextSize(dateTextSize);
@@ -262,14 +280,21 @@ public class SunShineWatchface extends CanvasWatchFaceService {
         @Override
         public void onAmbientModeChanged(boolean inAmbientMode) {
             super.onAmbientModeChanged(inAmbientMode);
+
+            Resources resources = SunShineWatchface.this.getResources();
             if (mAmbient != inAmbientMode) {
                 mAmbient = inAmbientMode;
                 if (mLowBitAmbient) {
                     mTextPaint.setAntiAlias(!inAmbientMode);
                     mDatePaint.setAntiAlias(!inAmbientMode);
                     mTemperaturePaint.setAntiAlias(!inAmbientMode);
+                    mXOffset = resources.getDimension(R.dimen.digital_x_offset_ambient);
                 }
                 invalidate();
+            }
+            if(!mAmbient)
+            {
+                mXOffset = resources.getDimension(R.dimen.digital_x_offset);
             }
 
             // Whether the timer should be running depends on whether we're visible (as well as
@@ -284,20 +309,29 @@ public class SunShineWatchface extends CanvasWatchFaceService {
                 canvas.drawColor(Color.BLACK);
             } else {
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
+                if(mWeatherBitmap != null) {
+                    canvas.drawBitmap(mWeatherBitmap, mImageXOffset, mImageYOffset, mBackgroundPaint);
+                }
             }
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
-            String text = mAmbient
-                    ? String.format("%d:%02d", mTime.hour, mTime.minute)
-                    : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
-            String dateStr = "4/23/15";
 
-            dateStr = String.format("%d/%d/%d", mTime.month, mTime.monthDay, mTime.year);
+            String text;
+            if(mAmbient)
+            {
+                text =  String.format("%d:%02d", mTime.hour, mTime.minute);
+            }
+            else
+            {
+                text =   String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
+            }
+            String dateStr = String.format("%d/%d/%d", mTime.month+1, mTime.monthDay, mTime.year);
+
             canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
-            canvas.drawText(dateStr, mDateXOffset + 5, mDateYOffset, mDatePaint);
+            canvas.drawText(dateStr, mDateXOffset, mDateYOffset, mDatePaint);
 
-            canvas.drawText(this.mHiTemp + "/" + this.mLowTemp, mTemperatureXOffset + 10, mTemperatureYOffset, mTemperaturePaint);
+            canvas.drawText(this.mHiTemp + "/" + this.mLowTemp, mTemperatureXOffset, mTemperatureYOffset, mTemperaturePaint);
 
         }
 
@@ -360,12 +394,36 @@ public class SunShineWatchface extends CanvasWatchFaceService {
 
                         String tempHi = dataMap.getString(TODAY_HI_TEMP);
                         String tempLow = dataMap.getString(TODAY_LOW_TEMP);
+                        Asset weathImgAsset = dataMap.getAsset(TODAY_WEATHER_IMG);
+                        mWeatherBitmap = loadBitmapFromAsset(weathImgAsset);
                         updateForecast(tempHi, tempLow);
                     }
                 } else if (event.getType() == DataEvent.TYPE_DELETED) {
                     // DataItem deleted
                 }
             }
+        }
+
+        public Bitmap loadBitmapFromAsset(Asset asset) {
+            if (asset == null) {
+                throw new IllegalArgumentException("Asset must be non-null");
+            }
+            ConnectionResult result =
+                    mGoogleApiClient.blockingConnect(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            if (!result.isSuccess()) {
+                return null;
+            }
+            // convert asset into a file descriptor and block until it's ready
+            InputStream assetInputStream = Wearable.DataApi.getFdForAsset(
+                    mGoogleApiClient, asset).await().getInputStream();
+            mGoogleApiClient.disconnect();
+
+            if (assetInputStream == null) {
+                Log.w(TAG, "Requested an unknown Asset.");
+                return null;
+            }
+            // decode the stream into a bitmap
+            return BitmapFactory.decodeStream(assetInputStream);
         }
 
         @Override

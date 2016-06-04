@@ -43,6 +43,7 @@ import com.example.android.sunshine.app.watch.TodayWatchProvider;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
@@ -53,6 +54,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -449,7 +451,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
                 updateWidgets();
                 updateMuzei();
                 notifyWeather();
-                updateWatches(1.2, 3.4);
+                updateWatches();
             }
             Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
             setLocationStatus(getContext(), LOCATION_STATUS_OK);
@@ -591,11 +593,12 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
     private static final String FORCAST_KEY = "/forecast";
     private static final String TODAY_HI_TEMP = "TODAY_HI_TEMP";
     private static final String TODAY_LOW_TEMP = "TODAY_LOW_TEMP";
+    private static final String TODAY_WEATHER_IMG = "TODAY_WEATHER_IMG";
 
 
     private static final String COUNT_KEY = "com.example.key.count";
 
-    private void updateWatches(double hi, double low)
+    private void updateWatches()
     {
         Context context = this.getContext();
 
@@ -621,10 +624,15 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
         String formattedMaxTemperature = Utility.formatTemperature(context, maxTemp);
         String formattedMinTemperature = Utility.formatTemperature(context, minTemp);
         data.close();
+        //convert the weather ArtResourceId into an asset
+
+        Asset WeatherImageAsset = createAssetFromBitmap(BitmapFactory.decodeResource(context.getResources(), weatherArtResourceId));
 
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create(FORCAST_KEY);
         putDataMapReq.getDataMap().putString(TODAY_HI_TEMP, formattedMaxTemperature);
         putDataMapReq.getDataMap().putString(TODAY_LOW_TEMP, formattedMinTemperature);
+        putDataMapReq.getDataMap().putAsset(TODAY_WEATHER_IMG, WeatherImageAsset);
+
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
@@ -632,42 +640,6 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
         Log.d(LOG_TAG, "sent hi and low temp: " + pendingResult.toString());
 
         return;
-        //send the weather data to the watch
-        // Get today's data from the ContentProvider
-//        String location = Utility.getPreferredLocation(context);
-//        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
-//                location, System.currentTimeMillis());
-//        Cursor data = context.getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null,
-//                null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
-//        if (data == null) {
-//            return;
-//        }
-//        if (!data.moveToFirst()) {
-//            data.close();
-//            return;
-//        }
-//
-//        // Extract the weather data from the Cursor
-//        int weatherId = data.getInt(INDEX_WEATHER_ID);
-//        int weatherArtResourceId = Utility.getArtResourceForWeatherCondition(weatherId);
-//        String description = data.getString(INDEX_SHORT_DESC);
-//        double maxTemp = data.getDouble(INDEX_MAX_TEMP);
-//        double minTemp = data.getDouble(INDEX_MIN_TEMP);
-//        String formattedMaxTemperature = Utility.formatTemperature(context, maxTemp);
-//        String formattedMinTemperature = Utility.formatTemperature(context, minTemp);
-//        data.close();
-//
-//        PutDataMapRequest mapRequest = PutDataMapRequest.create("/sunshine/today");
-//        mapRequest.getDataMap().putString("Test1", description);
-//        mapRequest.getDataMap().putString("Test2", formattedMaxTemperature);
-//        mapRequest.getDataMap().putString("Test3", formattedMinTemperature);
-//
-//        PutDataRequest request = mapRequest.asPutDataRequest();
-//
-//        DataApi.DataItemResult dataItemResult = Wearable.DataApi
-//                .putDataItem(mGoogleApiClient,request).await();
-//
-//        Log.d(LOG_TAG, "DataItemResult(" + dataItemResult.toString() +")");
     }
 
     private void initGoogleApiClient() {
@@ -680,6 +652,21 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
 
         mGoogleApiClient.connect();
     }
+
+    /**
+     * This takes a bitmap, and converts it into an asset to send to a wearable.
+     * Code taken from
+     * https://developer.android.com/training/wearables/data-layer/assets.html
+     *
+     * @param bitmap
+     * @return Asset
+     */
+    private static Asset createAssetFromBitmap(Bitmap bitmap) {
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
+        return Asset.createFromBytes(byteStream.toByteArray());
+    }
+
     /**
      * Helper method to handle insertion of a new location in the weather database.
      *

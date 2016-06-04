@@ -375,7 +375,7 @@ public class SunWatchFace extends CanvasWatchFaceService {
 
             canvas.drawText(mCount, mXOffset, mYOffset, mTextPaint);
             //canvas.drawText(dateStr, mDateXOffset, mYOffset + 75, mDatePaint);
-            canvas.drawText(dateStr, mDateXOffset + 5, mDateYOffset, mDatePaint);
+            canvas.drawText(dateStr, mDateXOffset, mYOffset, mDatePaint);
             canvas.drawText(temperatureStr, mTemperatureXOffset + 10, mTemperatureYOffset, mTemperaturePaint);
 
 
