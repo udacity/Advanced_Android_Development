@@ -24,6 +24,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.format.Time;
@@ -36,12 +38,23 @@ import com.example.android.sunshine.app.R;
 import com.example.android.sunshine.app.Utility;
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.muzei.WeatherMuzeiSource;
+import com.example.android.sunshine.app.watch.TodayWatchIntentService;
+import com.example.android.sunshine.app.watch.TodayWatchProvider;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,10 +65,22 @@ import java.net.URL;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
-public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
+public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
     public static final String ACTION_DATA_UPDATED =
             "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
+
+    private static final String[] FORECAST_COLUMNS = {
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
+            WeatherContract.WeatherEntry.COLUMN_SHORT_DESC,
+            WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+            WeatherContract.WeatherEntry.COLUMN_MIN_TEMP
+    };
+
+    //variables to send data to the android wear
+    private GoogleApiClient mGoogleApiClient;
+    private String mPeerId;
+
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
     public static final int SYNC_INTERVAL = 60 * 180;
@@ -73,9 +98,64 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     // these indices must match the projection
     private static final int INDEX_WEATHER_ID = 0;
-    private static final int INDEX_MAX_TEMP = 1;
-    private static final int INDEX_MIN_TEMP = 2;
+    private static final int INDEX_MIN_TEMP = 1;
+    private static final int INDEX_MAX_TEMP = 2;
     private static final int INDEX_SHORT_DESC = 3;
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        Log.d(LOG_TAG, "onConnected: " + bundle);
+        // Now you can use the Data Layer API
+//        Context context = getContext();
+//        //send the weather data to the watch
+//        // Get today's data from the ContentProvider
+//        String location = Utility.getPreferredLocation(context);
+//        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+//                location, System.currentTimeMillis());
+//        Cursor data = context.getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null,
+//                null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+//        if (data == null) {
+//            return;
+//        }
+//        if (!data.moveToFirst()) {
+//            data.close();
+//            return;
+//        }
+//
+//        // Extract the weather data from the Cursor
+//        int weatherId = data.getInt(INDEX_WEATHER_ID);
+//        int weatherArtResourceId = Utility.getArtResourceForWeatherCondition(weatherId);
+//        String description = data.getString(INDEX_SHORT_DESC);
+//        double maxTemp = data.getDouble(INDEX_MAX_TEMP);
+//        double minTemp = data.getDouble(INDEX_MIN_TEMP);
+//        String formattedMaxTemperature = Utility.formatTemperature(context, maxTemp);
+//        String formattedMinTemperature = Utility.formatTemperature(context, minTemp);
+//        data.close();
+//
+//        PutDataMapRequest mapRequest = PutDataMapRequest.create("/sunshine/today");
+//        mapRequest.getDataMap().putString("Test1", description);
+//        mapRequest.getDataMap().putString("Test2", formattedMaxTemperature);
+//        mapRequest.getDataMap().putString("Test3", formattedMinTemperature);
+//
+//        PutDataRequest request = mapRequest.asPutDataRequest();
+//
+//        DataApi.DataItemResult dataItemResult = Wearable.DataApi
+//                .putDataItem(mGoogleApiClient,request).await();
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+
+        Log.d(LOG_TAG, "onConnectionSuspended: " + cause);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(LOG_TAG, "onConnectionFailed: " + connectionResult);
+
+    }
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
@@ -89,6 +169,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public SunshineSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+
+        initGoogleApiClient();
     }
 
     @Override
@@ -369,6 +451,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 updateWidgets();
                 updateMuzei();
                 notifyWeather();
+                updateWatches();
             }
             Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
             setLocationStatus(getContext(), LOCATION_STATUS_OK);
@@ -503,6 +586,86 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 cursor.close();
             }
         }
+    }
+
+    private int count = 0;
+    private static final String TAG = "MOBILE_MAIN";
+    private static final String FORCAST_KEY = "/forecast";
+    private static final String TODAY_HI_TEMP = "TODAY_HI_TEMP";
+    private static final String TODAY_LOW_TEMP = "TODAY_LOW_TEMP";
+    private static final String TODAY_WEATHER_IMG = "TODAY_WEATHER_IMG";
+
+
+    private static final String COUNT_KEY = "com.example.key.count";
+
+    private void updateWatches()
+    {
+        Context context = this.getContext();
+
+        String location = Utility.getPreferredLocation(context);
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                location, System.currentTimeMillis());
+        Cursor data = context.getContentResolver().query(weatherForLocationUri, FORECAST_COLUMNS, null,
+                null, WeatherContract.WeatherEntry.COLUMN_DATE + " ASC");
+        if (data == null) {
+            return;
+        }
+        if (!data.moveToFirst()) {
+            data.close();
+            return;
+        }
+
+        // Extract the weather data from the Cursor
+        int weatherId = data.getInt(INDEX_WEATHER_ID);
+        int weatherArtResourceId = Utility.getArtResourceForWeatherCondition(weatherId);
+        String description = data.getString(INDEX_SHORT_DESC);
+        double maxTemp = data.getDouble(INDEX_MAX_TEMP);
+        double minTemp = data.getDouble(INDEX_MIN_TEMP);
+        String formattedMaxTemperature = Utility.formatTemperature(context, maxTemp);
+        String formattedMinTemperature = Utility.formatTemperature(context, minTemp);
+        data.close();
+        //convert the weather ArtResourceId into an asset
+
+        Asset WeatherImageAsset = createAssetFromBitmap(BitmapFactory.decodeResource(context.getResources(), weatherArtResourceId));
+
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create(FORCAST_KEY);
+        putDataMapReq.getDataMap().putString(TODAY_HI_TEMP, formattedMaxTemperature);
+        putDataMapReq.getDataMap().putString(TODAY_LOW_TEMP, formattedMinTemperature);
+        putDataMapReq.getDataMap().putAsset(TODAY_WEATHER_IMG, WeatherImageAsset);
+
+        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+        PendingResult<DataApi.DataItemResult> pendingResult =
+                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
+
+        Log.d(LOG_TAG, "sent hi and low temp: " + pendingResult.toString());
+
+        return;
+    }
+
+    private void initGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this.getContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                // Request access only to the Wearable API
+                .addApi(Wearable.API)
+                .build();
+
+        mGoogleApiClient.connect();
+    }
+
+    /**
+     * This takes a bitmap, and converts it into an asset to send to a wearable.
+     * Code taken from
+     * https://developer.android.com/training/wearables/data-layer/assets.html
+     *
+     * @param bitmap
+     * @return Asset
+     */
+    private static Asset createAssetFromBitmap(Bitmap bitmap) {
+        //bitmap = Bitmap.createScaledBitmap(bitmap,)
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 60, byteStream);
+        return Asset.createFromBytes(byteStream.toByteArray());
     }
 
     /**

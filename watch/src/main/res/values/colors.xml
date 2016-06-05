@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#3ec6f5</color>
+    <color name="background2">#000088</color>
+    <color name="digital_text">#ffffff</color>
+    <color name="digital_date_text">#e4e4e4</color>
+</resources>

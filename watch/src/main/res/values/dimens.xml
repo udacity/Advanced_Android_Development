@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="digital_text_size">40dp</dimen>
+    <dimen name="digital_text_size_round">45dp</dimen>
+
+    <dimen name="digital_x_offset">15dp</dimen>
+    <dimen name="digital_x_offset_round">15dp</dimen>
+    <dimen name="digital_x_offset_ambient">45dp</dimen>
+    <dimen name="digital_y_offset">145dp</dimen>
+
+
+    <!-- Temperature Dimensions -->
+
+    <dimen name="temperature_text_size">25dp</dimen>
+    <dimen name="temperature_text_size_round">28dp</dimen>
+
+    <dimen name="temperature_x_offset">55dp</dimen>
+    <dimen name="temperature_x_offset_round">60dp</dimen>
+    <dimen name="temperature_y_offset">100dp</dimen>
+
+    <!-- Date Dimensions -->
+
+    <dimen name="date_text_size">25dp</dimen>
+    <dimen name="date_text_size_round">28dp</dimen>
+
+    <dimen name="date_x_offset">50dp</dimen>
+    <dimen name="date_x_offset_round">45dp</dimen>
+    <dimen name="date_y_offset">170dp</dimen>
+
+
+    <!-- Image Dimensions -->
+    <dimen name="weather_img_y_offset">15dp</dimen>
+    <dimen name="weather_img_scaling">30dp</dimen>
+
+</resources>
