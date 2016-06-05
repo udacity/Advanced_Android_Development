@@ -24,12 +24,12 @@
     <dimen name="date_text_size_round">28dp</dimen>
 
     <dimen name="date_x_offset">50dp</dimen>
-    <dimen name="date_x_offset_round">50dp</dimen>
+    <dimen name="date_x_offset_round">45dp</dimen>
     <dimen name="date_y_offset">170dp</dimen>
 
 
     <!-- Image Dimensions -->
-    <dimen name="weather_img_y_offset">20dp</dimen>
+    <dimen name="weather_img_y_offset">15dp</dimen>
     <dimen name="weather_img_scaling">30dp</dimen>
 
 </resources>

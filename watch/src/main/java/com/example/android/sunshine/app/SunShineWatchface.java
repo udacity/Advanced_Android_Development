@@ -319,7 +319,7 @@ public class SunShineWatchface extends CanvasWatchFaceService {
             } else {
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
                 if(mWeatherBitmap != null) {
-                    canvas.drawBitmap(mWeatherBitmap, mCenterX + (mWeatherBitmap.getWidth()/2) , mImageYOffset, mBackgroundPaint);
+                    canvas.drawBitmap(mWeatherBitmap, (mCenterX - 55.0f), mImageYOffset, mBackgroundPaint);
                 }
             }
 
