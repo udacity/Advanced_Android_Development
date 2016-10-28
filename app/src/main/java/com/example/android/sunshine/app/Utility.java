@@ -24,9 +24,7 @@ import android.text.format.Time;
 
 import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 public class Utility {
@@ -70,18 +68,12 @@ public class Utility {
     public static String formatTemperature(Context context, double temperature) {
         // Data stored in Celsius by default.  If user prefers to see in Fahrenheit, convert
         // the values here.
-        String suffix = "\u00B0";
         if (!isMetric(context)) {
             temperature = (temperature * 1.8) + 32;
         }
 
         // For presentation, assume the user doesn't care about tenths of a degree.
         return String.format(context.getString(R.string.format_temperature), temperature);
-    }
-
-    static String formatDate(long dateInMilliseconds) {
-        Date date = new Date(dateInMilliseconds);
-        return DateFormat.getDateInstance().format(date);
     }
 
     // Format used for storing dates in the database.  ALso used for converting those strings
@@ -117,7 +109,7 @@ public class Utility {
             return String.format(context.getString(
                     formatId,
                     today,
-                    getFormattedMonthDay(context, dateInMillis)));
+                    getFormattedMonthDay(dateInMillis)));
         } else if ( julianDay < currentJulianDay + 7 ) {
             // If the input date is less than a week in the future, just return the day name.
             return getDayName(context, dateInMillis);
@@ -143,7 +135,7 @@ public class Utility {
         return String.format(context.getString(
                 formatId,
                 day,
-                getFormattedMonthDay(context, dateInMillis)));
+                getFormattedMonthDay(dateInMillis)));
     }
 
     /**
@@ -182,13 +174,9 @@ public class Utility {
      *                in Utility.DATE_FORMAT
      * @return The day in the form of a string formatted "December 6"
      */
-    public static String getFormattedMonthDay(Context context, long dateInMillis ) {
-        Time time = new Time();
-        time.setToNow();
-        SimpleDateFormat dbDateFormat = new SimpleDateFormat(Utility.DATE_FORMAT);
+    public static String getFormattedMonthDay(long dateInMillis ) {
         SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd");
-        String monthDayString = monthDayFormat.format(dateInMillis);
-        return monthDayString;
+        return monthDayFormat.format(dateInMillis);
     }
 
     public static String getFormattedWind(Context context, float windSpeed, float degrees) {
