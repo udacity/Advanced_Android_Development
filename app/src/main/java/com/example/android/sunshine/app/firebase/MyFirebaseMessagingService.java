@@ -1,20 +1,4 @@
-/*
- * Copyright (C) 2015 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.example.android.sunshine.app.gcm;
+package com.example.android.sunshine.app.firebase;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -22,18 +6,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.android.sunshine.app.MainActivity;
 import com.example.android.sunshine.app.R;
-import com.google.android.gms.gcm.GcmListenerService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 
-public class MyGcmListenerService extends GcmListenerService {
+import java.util.Map;
 
-    private static final String TAG = "MyGcmListenerService";
+public class MyFirebaseMessagingService extends FirebaseMessagingService {
+    private static final String TAG = "MyFCMMessagingService";
 
     private static final String EXTRA_DATA = "data";
     private static final String EXTRA_WEATHER = "weather";
@@ -44,12 +29,16 @@ public class MyGcmListenerService extends GcmListenerService {
     /**
      * Called when message is received.
      *
-     * @param from SenderID of the sender.
-     * @param data Data bundle containing message data as key/value pairs.
-     *             For Set of keys use data.keySet().
+     * @param message RemoteMessage sent from server - use getData() for key/value pairs
+     *                & getFrom() for sender
      */
+
     @Override
-    public void onMessageReceived(String from, Bundle data) {
+    public void onMessageReceived(RemoteMessage message) {
+
+        Map<String,String> data = message.getData();
+        String from = message.getFrom();
+
         // Time to unparcel the bundle!
         if (!data.isEmpty()) {
             // TODO: gcm_default sender ID comes from the API console
@@ -60,13 +49,13 @@ public class MyGcmListenerService extends GcmListenerService {
             // Not a bad idea to check that the message is coming from your server.
             if ((senderId).equals(from)) {
                 // Process message and then post a notification of the received message.
-                String weather = data.getString(EXTRA_WEATHER);
-                String location = data.getString(EXTRA_LOCATION);
+                String weather = data.get(EXTRA_WEATHER);
+                String location = data.get(EXTRA_LOCATION);
                 String alert =
-                        String.format(getString(R.string.gcm_weather_alert), weather, location);
+                        String.format(getString(R.string.fcm_weather_alert), weather, location);
                 sendNotification(alert);
             }
-            Log.i(TAG, "Received: " + data.toString());
+            Log.i(TAG, "Received: " + message.toString());
         }
     }
 
