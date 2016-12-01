@@ -32,13 +32,6 @@
     <uses-permission
         android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Permissions required for Google Cloud Messaging -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <permission android:name="com.example.android.sunshine.app.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-    <uses-permission android:name="com.example.android.sunshine.app.permission.C2D_MESSAGE" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -101,34 +94,19 @@
                 android:resource="@xml/syncadapter" />
         </service>
 
-        <!-- The Google Cloud Messaging receiver and services -->
-        <receiver
-            android:name="com.google.android.gms.gcm.GcmReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <category android:name="com.example.android.sunshine.app" />
-            </intent-filter>
-        </receiver>
+        <!-- Firebase Cloud Messaging Services -->
         <service
-            android:name=".gcm.MyGcmListenerService"
-            android:exported="false" >
+            android:name=".firebase.MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+
         <service
-            android:name=".gcm.MyInstanceIDListenerService"
-            android:exported="false">
+            android:name=".firebase.MyFirebaseInstanceIDService">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
-        </service>
-        <service
-            android:name=".gcm.RegistrationIntentService"
-            android:exported="false" >
         </service>
     </application>
 
