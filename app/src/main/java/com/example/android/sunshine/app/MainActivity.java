@@ -41,6 +41,7 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mLocation = Utility.getPreferredLocation(this);
 
         setContentView(R.layout.activity_main);
@@ -68,24 +69,10 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
 
         SunshineSyncAdapter.initializeSyncAdapter(this);
 
-        /*
-        // If Google Play Services is up to date, we'll want to register GCM. If it is not, we'll
-        // skip the registration and this device will not receive any downstream messages from
-        // our fake server. Because weather alerts are not a core feature of the app, this should
-        // not affect the behavior of the app, from a user perspective.
-        if (checkPlayServices()) {
-            // Because this is the initial creation of the app, we'll want to be certain we have
-            // a token. If we do not, then we will start the IntentService that will register this
-            // application with GCM.
-            SharedPreferences sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(this);
-            boolean sentToken = sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false);
-            if (!sentToken) {
-                Intent intent = new Intent(this, RegistrationIntentService.class);
-                startService(intent);
-            }
-        }
-        */
+        // For informing user of Google Play Services availability
+        // FCM now auto registers token
+        checkPlayServices();
+
     }
 
     @Override

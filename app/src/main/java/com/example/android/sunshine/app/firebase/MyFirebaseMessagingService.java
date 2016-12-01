@@ -35,7 +35,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage message) {
-
+        Log.w(TAG,"Message Received!");
         Map<String,String> data = message.getData();
         String from = message.getFrom();
 
